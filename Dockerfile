@@ -7,19 +7,25 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy source code and config files
-COPY tsconfig.json ./
-COPY src ./src
+# Copy source code
+COPY . .
+
+# Set NODE_ENV for build
+ENV NODE_ENV=production
 
 # Build TypeScript code
 RUN npm run build
 RUN echo "Contents of /app/dist after build:"
 RUN ls -la dist
+RUN ls -la dist/database || echo "Database directory not found in dist!"
 
 # Production stage
 FROM node:20-alpine
 
 WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
 
 # Copy package files and install production dependencies
 COPY package*.json ./
@@ -27,8 +33,10 @@ RUN npm install --production
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist /app/dist
+
 RUN echo "Contents of /app/dist in production stage:"
 RUN ls -la dist
+RUN ls -la dist/database || echo "Database directory not found in dist!"
 
 # Copy environment file if it exists
 COPY .env* ./

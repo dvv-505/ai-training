@@ -2,7 +2,8 @@ import 'reflect-metadata';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { config } from 'dotenv';
-import { AppDataSource } from './database/data-source';
+import { AppDataSource } from './database';
+
 
 config();
 
